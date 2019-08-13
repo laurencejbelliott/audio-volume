@@ -1,5 +1,5 @@
 # audio-volume
-A ROS package for tracking and changing audio volume level via a ROS node `/volume` which interfaces with `amixer`
+A ROS package for tracking and changing audio volume level via a ROS node `/volume` which interfaces with `amixer` from [alsa-utils](https://github.com/alsa-project/alsa-utils).
 
 The audio control to use with amixer defaults to 'Master' and can be set with the rosparam `/volume/control`.
 The latched topic `/volume/percent` contains the current percentage audio volume.
