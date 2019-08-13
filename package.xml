@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>volume</name>
+  <version>1.0.0</version>
+  <description>A package to interface amixer with ROS topics</description>
+
+  <maintainer email="laurencejbelliott@gmail.com">Laurence Elliott</maintainer>
+  <license>MIT</license>
+  <author email="jane.doe@example.com">Jane Doe</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+</package>
