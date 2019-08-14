@@ -7,7 +7,7 @@ control = rospy.get_param('/volume/control', 'Master')
 rospy.init_node("volume")
 
 # Subtract or add to the volume percentage by the value published on '/volume/percentChange'
-def vcb(data):
+def vPercentCB(data):
     print(abs(int(data.data)))
     if data.data >= 0:
         os.system("amixer -D pulse sset " + control + " " + str(data.data) + "%+")
@@ -15,7 +15,15 @@ def vcb(data):
         os.system("amixer -D pulse sset " + control + " " + str(abs(int(data.data))) + "%-")
 
 
-vSub = rospy.Subscriber("/volume/percentChange", Int8, callback=vcb)
+vPercentSub = rospy.Subscriber("/volume/percentChange", Int8, callback=vPercentCB)
+
+# Set the volume percentage to the value published on '/volume/percentSet'
+def vSetCB(data):
+    print(abs(int(data.data)))
+    os.system("amixer -D pulse sset " + control + " " + str(data.data) + "%")
+
+
+vPercentSub = rospy.Subscriber("/volume/percentSet", Int8, callback=vSetCB)
 
 # Every .25 seconds, search for the volume percentage in the string 
 # output of 'amixer get Master', convert to Int8 and publish to
