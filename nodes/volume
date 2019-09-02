@@ -3,6 +3,7 @@ import rospy, os, re, subprocess
 from std_msgs.msg import Int8
 
 control = rospy.get_param('/volume/control', 'Master')
+card = rospy.get_param('/volume/card', '0')
 
 rospy.init_node("volume")
 
@@ -10,9 +11,9 @@ rospy.init_node("volume")
 def vPercentCB(data):
     print(abs(int(data.data)))
     if data.data >= 0:
-        os.system("amixer -D pulse sset " + control + " " + str(data.data) + "%+")
+        os.system("amixer -D pulse sset " + control + " " + str(data.data) + "%+ -c " + str(card))
     else:
-        os.system("amixer -D pulse sset " + control + " " + str(abs(int(data.data))) + "%-")
+        os.system("amixer -D pulse sset " + control + " " + str(abs(int(data.data))) + "%- -c " + str(card))
 
 
 vPercentSub = rospy.Subscriber("/volume/percentChange", Int8, callback=vPercentCB)
