@@ -6,8 +6,8 @@ control = rospy.get_param('/volume/control', 'Master')
 card = rospy.get_param('/volume/card', '0')
 
 # force the volume to be in the perc range below
-lowerVolLimit = 30
-upperVolLimit = 80
+lowerVolLimit = rospy.get_param('/volume/minPercVol', 30)
+upperVolLimit = rospy.get_param('/volume/maxPercVol', 80)
 
 prevVolPercent = Int8(-1)
 
