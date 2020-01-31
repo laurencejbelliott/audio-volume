@@ -33,7 +33,7 @@ vPercentSub = rospy.Subscriber("/volume/percentChange", Int8, callback=vPercentC
 def vSetCB(data):
     quantity = data.data
     print("Set to: %s (%s)" % (quantity, prevVolPercent))
-    if quantity >= lowerVolLimit and quantity >= upperVolLimit:
+    if quantity >= lowerVolLimit and quantity <= upperVolLimit:
         os.system("amixer -D pulse sset " + control + " " + str(data.data) + "%")
 
 
