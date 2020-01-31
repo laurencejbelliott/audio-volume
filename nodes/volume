@@ -5,23 +5,36 @@ from std_msgs.msg import Int8
 control = rospy.get_param('/volume/control', 'Master')
 card = rospy.get_param('/volume/card', '0')
 
+# force the volume to be in the perc range below
+lowerVolLimit = rospy.get_param('/volume/minPercVol', 30)
+upperVolLimit = rospy.get_param('/volume/maxPercVol', 80)
+
+prevVolPercent = Int8(-1)
+
 rospy.init_node("volume")
 
 # Subtract or add to the volume percentage by the value published on '/volume/percentChange'
 def vPercentCB(data):
-    print(abs(int(data.data)))
-    if data.data >= 0:
-        os.system("amixer -D pulse sset " + control + " " + str(data.data) + "%+ -c " + str(card))
+    quantity = data.data
+
+    if quantity >= 0:
+        print("increase by: %s (%s)" % (abs(quantity), prevVolPercent))
+        if (prevVolPercent.data + quantity) <= upperVolLimit:
+            os.system("amixer -D pulse sset " + control + " " + str(data.data) + "%+ -c " + str(card))
     else:
-        os.system("amixer -D pulse sset " + control + " " + str(abs(int(data.data))) + "%- -c " + str(card))
+        print("decrease by: %s (%s)" % (abs(quantity), prevVolPercent))
+        if (prevVolPercent.data + quantity) >= lowerVolLimit:
+            os.system("amixer -D pulse sset " + control + " " + str(abs(int(data.data))) + "%- -c " + str(card))
 
 
 vPercentSub = rospy.Subscriber("/volume/percentChange", Int8, callback=vPercentCB)
 
 # Set the volume percentage to the value published on '/volume/percentSet'
 def vSetCB(data):
-    print(abs(int(data.data)))
-    os.system("amixer -D pulse sset " + control + " " + str(data.data) + "%")
+    quantity = data.data
+    print("Set to: %s (%s)" % (quantity, prevVolPercent))
+    if quantity >= lowerVolLimit and quantity <= upperVolLimit:
+        os.system("amixer -D pulse sset " + control + " " + str(data.data) + "%")
 
 
 vPercentSub = rospy.Subscriber("/volume/percentSet", Int8, callback=vSetCB)
@@ -32,7 +45,6 @@ vPercentSub = rospy.Subscriber("/volume/percentSet", Int8, callback=vSetCB)
 volPercentPub = rospy.Publisher('volume/percent', Int8, queue_size=1, latch=True)
 volPercentRE = re.compile("(?<=\[)[0-9]+(?=%\])")
 
-prevVolPercent = None
 while not rospy.is_shutdown():
     amixerOutput = subprocess.check_output(["amixer", "get", control])
     volumePercent = Int8(int(volPercentRE.search(amixerOutput).group(0)))
